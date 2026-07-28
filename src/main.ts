@@ -1,7 +1,8 @@
 import {
   setUpFilters,
   setUpValidation,
-  setUpSwagger
+  setUpSwagger,
+  setUpSecurity,
 } from './bootstrap';
 import { AppModule } from './app.module';
 import { NestFactory } from '@nestjs/core';
@@ -18,6 +19,7 @@ async function bootstrap() {
 
   setUpValidation(app);
   setUpFilters(app);
+  await setUpSecurity(app);
   if(configService.get('app.nodeEnv') !== 'production') {
     setUpSwagger(app);
   }
