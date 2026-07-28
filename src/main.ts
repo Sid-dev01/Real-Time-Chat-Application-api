@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
+import { setUpSwagger } from './swagger/swagger.config';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
 
 async function bootstrap() {
@@ -11,9 +12,13 @@ async function bootstrap() {
 
   const configService = app.get(ConfigService);
 
+  if(configService.get('app.nodeEnv') !== 'production') {
+    setUpSwagger(app);
+  }
+
   await app.listen({
-    port: configService.get<number>('PORT'),
-    host: configService.get<string>('HOST'),
+    port: configService.get<number>('app.port'),
+    host: configService.get<string>('app.host'),
   });
 }
 
