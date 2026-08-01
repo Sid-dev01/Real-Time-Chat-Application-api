@@ -7,6 +7,7 @@ import {
 import { AppModule } from './app.module';
 import { NestFactory } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
+import { ResponseInterceptor } from '@common/interceptors';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
 
 async function bootstrap() {
@@ -16,6 +17,9 @@ async function bootstrap() {
 
   setUpValidation(app);
   setUpFilters(app);
+  
+  app.useGlobalInterceptors(new ResponseInterceptor());
+
   await setUpSecurity(app);
   if (configService.get('app.nodeEnv') !== 'production') {
     setUpSwagger(app);
