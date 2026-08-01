@@ -5,15 +5,15 @@ import {
     HttpException,
     HttpStatus,
 } from '@nestjs/common';
-import { FastifyReply, FastifyRequest } from 'fastify';
+import { FastifyReply } from 'fastify';
 
 
 @Catch()
 export class AllExceptionFilter implements ExceptionFilter{
     catch(exception: unknown, host: ArgumentsHost) : void {
+
         const context = host.switchToHttp();
 
-        const request = context.getRequest<FastifyRequest>();
         const response = context.getResponse<FastifyReply>();
 
         const status = 
@@ -26,20 +26,28 @@ export class AllExceptionFilter implements ExceptionFilter{
                 ? exception.getResponse()
                 : 'Internal Server Error';
 
-        const message = 
-            typeof exceptionResponse === 'object' &&
-            exceptionResponse !== null &&
-            'message' in exceptionResponse
-                ? exceptionResponse.message
-                : exceptionResponse;
+        let message = 'Internal Server Error';
+        let errors: string[] | null = null;
+
+        if (typeof exceptionResponse === 'string') {
+            message = exceptionResponse;
+        }else if (typeof exceptionResponse === 'object' && exceptionResponse !== null) {
+            const responseBody = exceptionResponse as {
+                message?: string | string[];
+            };
+
+            if(Array.isArray(responseBody.message)) {
+                message = 'Validation failed';
+                errors = responseBody.message;
+            }else if (responseBody.message) {
+                message = responseBody.message;
+            }
+        }
 
         response.status(status).send({
             success: false,
-            statusCode: status,
-            timestamp: new Date().toISOString(),
-            path: request.url,
-            method: request.method,
             message,
+            errors,
         })
     }
 }
