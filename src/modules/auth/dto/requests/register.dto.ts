@@ -1,4 +1,11 @@
-import { IsEmail, IsString, Length, Matches } from 'class-validator';
+import { 
+    IsEmail, 
+    IsMobilePhone,
+    IsOptional,
+    IsString, 
+    Length, 
+    Matches 
+} from 'class-validator';
 
 export class RegisterDto {
     @IsString()
@@ -8,8 +15,13 @@ export class RegisterDto {
     })
     username!: string;
 
+    @IsOptional()
     @IsEmail()
     email!: string;
+
+    @IsOptional()
+    @IsMobilePhone('en-IN')
+    mobile!: string;
 
     @IsString()
     @Length(8, 20)
