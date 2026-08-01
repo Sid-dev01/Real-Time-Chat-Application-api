@@ -5,7 +5,9 @@ import {
 } from '@nestjs/common';
 import { NewUser } from '@db/schema';
 import { AuthRepository } from './auth.repository';
+import { SuccessResponse } from '@common/responses';
 import { RegisterDto } from './dto/requests/register.dto';
+import { UserResponseDto } from './dto/responses/user-response.dto';
 import { PasswordService } from '@common/services/password.service';
 
 
@@ -17,16 +19,9 @@ export class AuthService {
         private readonly passwordService: PasswordService
     ) {}
 
-    async register(registerDto: RegisterDto): Promise<{
-        success: boolean;
-        message: string;
-        data: {
-            id: string;
-            username: string;
-            email: string | null;
-            mobile: string | null;
-        }
-    }> {
+    async register(registerDto: RegisterDto): Promise<
+        SuccessResponse<UserResponseDto>
+    > {
 
         if (!registerDto.email && !registerDto.mobile) {
             throw new BadRequestException(
@@ -67,15 +62,16 @@ export class AuthService {
 
         const user  = await this.authRepository.createUser(newUser);
 
-        return {
-            success: true,
-            message: 'Account created successfully.',
-            data: {
-                id: user.id,
-                username: user.username,
-                email: user.email,
-                mobile: user.mobile,
-            }
-        }
+        const response: UserResponseDto = {
+            id: user.id,
+            username: user.username,
+            email: user.email,
+            mobile: user.mobile,
+        };
+
+        return new SuccessResponse(
+            response,
+            'Account created successfully.'
+        )
     }
 }
