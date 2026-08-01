@@ -10,5 +10,7 @@ export const envValidationSchema = Joi.object({
 
     HOST: Joi.string().required(),
 
-    PORT: Joi.number().required()
+    PORT: Joi.number().required(),
+
+    BCRYPT_SALT_ROUNDS: Joi.number().integer().min(10).max(14).required(),
 })

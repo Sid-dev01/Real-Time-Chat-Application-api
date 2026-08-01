@@ -1,4 +1,9 @@
-import { setUpFilters, setUpValidation, setUpSwagger, setUpSecurity } from './bootstrap';
+import { 
+  setUpFilters, 
+  setUpValidation, 
+  setUpSwagger, 
+  setUpSecurity 
+} from './bootstrap';
 import { AppModule } from './app.module';
 import { NestFactory } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
