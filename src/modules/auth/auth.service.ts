@@ -9,6 +9,7 @@ import { SuccessResponse } from '@common/responses';
 import { RegisterDto } from './dto/requests/register.dto';
 import { UserResponseDto } from './dto/responses/user-response.dto';
 import { PasswordService } from '@common/services/password.service';
+import { AUTH_MESSAGES } from '@common/constants';
 
 
 @Injectable()
@@ -25,21 +26,21 @@ export class AuthService {
 
         if (!registerDto.email && !registerDto.mobile) {
             throw new BadRequestException(
-                'Either email or mobile number is required.'
+                AUTH_MESSAGES.EMAIL_OR_MOBILE_REQUIRED
             )
         }
 
         const existingUsername =  await this.authRepository.findByUsername(registerDto.username);
 
         if (existingUsername) {
-            throw new ConflictException('Username is already taken.');
+            throw new ConflictException(AUTH_MESSAGES.USERNAME_TAKEN);
         }
 
         if (registerDto.email) {
             const existingEmail = await this.authRepository.findByEmail(registerDto.email);
 
             if(existingEmail) {
-                throw new ConflictException('Email is already registered.');
+                throw new ConflictException(AUTH_MESSAGES.EMAIL_REGISTERED);
             }
         }
 
@@ -47,7 +48,7 @@ export class AuthService {
             const existingMobile = await this.authRepository.findByMobile(registerDto.mobile);
 
             if(existingMobile) {
-                throw new ConflictException('Mobile number already exists.');
+                throw new ConflictException(AUTH_MESSAGES.MOBILE_REGISTERED);
             }
         }
 

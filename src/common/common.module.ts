@@ -1,5 +1,5 @@
 import { Global, Module } from '@nestjs/common';
-import { PasswordService } from './password.service';
+import { PasswordService } from './services/password.service';
 
 @Global()
 @Module({

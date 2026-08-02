@@ -10,7 +10,7 @@ export class PasswordService {
     
     constructor(private readonly configService: ConfigService) {
         this.saltRounds = this.configService.getOrThrow<number>(
-            'app.bcryptSaltRounds'
+            'auth.bcryptSaltRounds'
         )
     }
 
