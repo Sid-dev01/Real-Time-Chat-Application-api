@@ -30,7 +30,10 @@ async function bootstrap() {
     host: configService.get<string>('app.host'),
   });
 
-  console.log(`🚀 Server is running on http://localhost:${configService.get<number>('app.port')}`);
+  if (configService.get<string>('app.nodeEnv')) {
+    console.log(`🚀 Server is running on http://localhost:${configService.get<number>('app.port')}`);
+  }
+
 }
 
 bootstrap();

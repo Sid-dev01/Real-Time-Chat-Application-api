@@ -1,94 +1,103 @@
+import ms, { StringValue } from 'ms';
 import { JwtService } from '@nestjs/jwt';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { JwtPayload } from '@common/interfaces';
-import type { SignOptions } from 'jsonwebtoken';
-
+import { TokenPair, JwtPayload, AccessTokenPayload, RefreshTokenPayload } from '@common/interfaces';
 
 @Injectable()
 export class TokenService {
-    constructor(
-        private readonly jwtService: JwtService,
-        private readonly configService: ConfigService
-    ) {}
+  constructor(
+    private readonly jwtService: JwtService,
+    private readonly configService: ConfigService,
+  ) {}
 
-    private get accessTokenSecret(): string {
-        return this.configService.getOrThrow<string>('auth.jwt.accessTokenSecret');    
+  private get accessTokenSecret(): string {
+    return this.configService.getOrThrow<string>('auth.jwt.accessTokenSecret');
+  }
+
+  private get accessTokenExpiresIn(): StringValue {
+    return this.configService.getOrThrow<StringValue>('auth.jwt.accessTokenExpiresIn');
+  }
+
+  private get refreshTokenSecret(): string {
+    return this.configService.getOrThrow<string>('auth.jwt.refreshTokenSecret');
+  }
+
+  private get refreshTokenExpiresIn(): StringValue {
+    return this.configService.getOrThrow<StringValue>(
+      'auth.jwt.refreshTokenExpiresIn',
+    );
+  }
+
+  calculateRefreshTokenExpiration(): Date {
+    const expiresIn = this.refreshTokenExpiresIn;
+
+    if(typeof expiresIn === 'number') {
+        return new Date(Date.now() + expiresIn * 1000);
+    }
+    
+    const duration = ms(expiresIn as StringValue);
+    
+    if (duration == undefined) {
+        throw new Error(`Invalid refresh token expiration: ${expiresIn}`);
     }
 
-    private get accessTokenExpiresIn(): SignOptions['expiresIn'] {
-        return this.configService.getOrThrow<SignOptions['expiresIn']>('auth.jwt.accessTokenExpiresIn');
-    }
+    return new Date(Date.now() + duration);
+  }
 
-    private get refreshTokenSecret() : string {
-        return this.configService.getOrThrow<string>('auth.jwt.refreshTokenSecret');
-    }
+  //Internal Helpers for signing JWT
+  private async generateToken<T extends JwtPayload>(
+    payload: T,
+    secret: string,
+    expiresIn: StringValue,
+  ): Promise<string> {
+    return this.jwtService.signAsync(payload, {
+      secret,
+      expiresIn,
+    });
+  }
 
-    private get refreshTokenExpiresIn(): SignOptions['expiresIn'] {
-        return this.configService.getOrThrow<SignOptions['expiresIn']>('auth.jwt.refreshTokenExpiresIn');
-    }
+  //Internal Helpers for verifying JWT
+  private async verifyToken<T extends JwtPayload>(token: string, secret: string): Promise<T> {
+    return this.jwtService.verifyAsync<T>(token, {
+      secret,
+    });
+  }
 
-    //Helper function for the acces tokens
-    private async generateToken(
-        payload: JwtPayload,
-        secret: string,
-        expiresIn: SignOptions['expiresIn']
-    ): Promise<string> {
-        return this.jwtService.signAsync(payload, {
-            secret,
-            expiresIn
-        });
-    }
+  async generateAccessToken(userId: string): Promise<string> {
+    const payload: AccessTokenPayload = {
+      sub: userId,
+    };
 
-    //Helper function for the refresh tokens
-    private async verifyToken(
-        token: string,
-        secret: string,
-    ): Promise<JwtPayload> {
-        return this.jwtService.verifyAsync<JwtPayload>(
-            token,
-            {
-                secret,
-            }
-        )
-    }
+    return this.generateToken(payload, this.accessTokenSecret, this.accessTokenExpiresIn);
+  }
 
-    async generateAccessToken(userId: string): Promise<string> {
-        const payload: JwtPayload = {
-            sub: userId,
-        }
+  async generateRefreshToken(userId: string, sessionId: string): Promise<string> {
+    const payload: RefreshTokenPayload = {
+      sub: userId,
+      sid: sessionId,
+    };
 
-        return this.generateToken(
-            payload,
-            this.accessTokenSecret,
-            this.accessTokenExpiresIn
-        )
-    }
+    return this.generateToken(payload, this.refreshTokenSecret, this.refreshTokenExpiresIn);
+  }
 
-    async generateRefreshToken(userId: string): Promise<string> {
-        const payload: JwtPayload = {
-            sub: userId,
-        };
+  async verifyAccessToken(token: string): Promise<AccessTokenPayload> {
+    return this.verifyToken<AccessTokenPayload>(token, this.accessTokenSecret);
+  }
 
-        return this.generateToken(
-            payload,
-            this.refreshTokenSecret,
-            this.refreshTokenExpiresIn
-        )
-    }
+  async verifyRefreshToken(token: string): Promise<RefreshTokenPayload> {
+    return this.verifyToken<RefreshTokenPayload>(token, this.refreshTokenSecret);
+  }
 
-    async verifyAccessToken(token: string): Promise<JwtPayload> {
-        return this.verifyToken(
-            token,
-            this.accessTokenSecret
-        )
-    }
+  async generateAuthTokens(userId: string, sessionId: string): Promise<TokenPair> {
+    const [accessToken, refreshToken] = await Promise.all([
+      this.generateAccessToken(userId),
+      this.generateRefreshToken(userId, sessionId),
+    ]);
 
-    async verifyRefreshToken(token: string): Promise<JwtPayload> {
-        return this.verifyToken(
-            token,
-            this.refreshTokenSecret
-        )
-    }
-
+    return {
+      accessToken,
+      refreshToken,
+    };
+  }
 }
