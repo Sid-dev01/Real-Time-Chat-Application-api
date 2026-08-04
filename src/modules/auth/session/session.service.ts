@@ -1,6 +1,7 @@
 import { generateId } from '@common/utils';
 import { Injectable } from '@nestjs/common';
 import { TokenPair } from '@common/interfaces';
+import { ClientInfo } from '@common/interfaces';
 import { SessionStatus } from '@common/constants';
 import { PasswordService } from  '@common/services';
 import { TokenService } from '../jwt/token.service';

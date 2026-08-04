@@ -12,20 +12,20 @@ export class TokenService {
   ) {}
 
   private get accessTokenSecret(): string {
-    return this.configService.getOrThrow<string>('auth.jwt.accessTokenSecret');
+    return this.configService.getOrThrow<string>('auth.jwtAccessSecret');
   }
 
   private get accessTokenExpiresIn(): StringValue {
-    return this.configService.getOrThrow<StringValue>('auth.jwt.accessTokenExpiresIn');
+    return this.configService.getOrThrow<StringValue>('auth.jwtAccessExpiresIn');
   }
 
   private get refreshTokenSecret(): string {
-    return this.configService.getOrThrow<string>('auth.jwt.refreshTokenSecret');
+    return this.configService.getOrThrow<string>('auth.jwtRefreshSecret');
   }
 
   private get refreshTokenExpiresIn(): StringValue {
     return this.configService.getOrThrow<StringValue>(
-      'auth.jwt.refreshTokenExpiresIn',
+      'auth.jwtRefreshExpiresIn',
     );
   }
 
