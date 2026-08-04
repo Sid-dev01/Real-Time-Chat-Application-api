@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm';
+import { eq, or } from 'drizzle-orm';
 import { Injectable } from '@nestjs/common';
 import { DrizzleService } from '@db/drizzle.service';
 import { users, type NewUser, type User } from '@db/schema';
@@ -48,5 +48,21 @@ export class AuthRepository {
         .returning();
 
         return createdUser;
+    }
+
+    async findByCredential(credential: string): Promise<User | null> {
+        const [user] = await this.db
+        .select()
+        .from(users)
+        .where(
+            or(
+                eq(users.username, credential),
+                eq(users.email, credential),
+                eq(users.mobile, credential),
+            ),
+        )
+        .limit(1);
+
+        return user ?? null
     }
 }

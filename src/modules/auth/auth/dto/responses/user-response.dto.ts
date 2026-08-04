@@ -1,4 +1,4 @@
-export class UserResponseDto {
+export class RegisterResponseDto {
     id!: string;
     username!: string;
     email!: string | null;
