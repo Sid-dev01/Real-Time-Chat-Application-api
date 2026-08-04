@@ -1,17 +1,17 @@
 import { sql } from 'drizzle-orm';
 import {
     pgTable,
-    uuid,
     varchar,
     timestamp,
     check
 } from 'drizzle-orm/pg-core';
+import { generateId } from '@common/utils';
 
 
 export const users = pgTable(
     'users',
     {
-        id: uuid('id').defaultRandom().primaryKey(),
+        id: varchar('id', { length: 26 }).primaryKey(),
         username: varchar('username', { length: 50 }).notNull().unique(),
         email: varchar('email', { length: 255 }).unique(),
         mobile: varchar('mobile', { length: 10 }).unique(),
@@ -23,9 +23,10 @@ export const users = pgTable(
         .defaultNow()
         .notNull(),
 
-        updateAt: timestamp('updated_at', {
+        updatedAt: timestamp('updated_at', {
             withTimezone: true,
         })
+        .$onUpdateFn(() => new Date())
         .defaultNow()
         .notNull(),
     },
