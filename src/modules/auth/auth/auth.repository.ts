@@ -11,6 +11,16 @@ export class AuthRepository {
         this.db = drizzleService.database;
     }
 
+    async findById(userId: string): Promise<User | null> {
+        const [user] = await this.db
+        .select()
+        .from(users)
+        .where(eq(users.id, userId))
+        .limit(1);
+
+        return user ?? null;
+    }
+
     async findByUsername(username: string): Promise<User | null> {
         const [user] = await this.db
         .select()
