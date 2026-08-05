@@ -9,4 +9,8 @@ export const AUTH_MESSAGES = {
     MOBILE_REGISTERED: 'Mobile number is already registered.',
 
     EMAIL_OR_MOBILE_REQUIRED: 'Either email or mobile number is required.',
+
+    ACCESS_TOKKEN_REQUIRED: 'Access token is required.',
+
+    INVALID_ACCESS_TOKEN: 'Invalid access token.',
 } as const;
