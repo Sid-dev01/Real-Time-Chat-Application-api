@@ -1,14 +1,16 @@
 import { NewUser } from '@db/schema';
 import { generateId } from '@common/utils';
+import type { AuthSession } from '@db/schema';
 import { ClientInfo } from '@common/interfaces';
 import { AUTH_MESSAGES } from '@common/constants';
 import { AuthRepository } from './auth.repository';
 import { SuccessResponse } from '@common/responses';
 import { SessionService } from '../session/session.service';
 import { PasswordService } from '@common/services/password.service';
+import { CurrentUser as CurrentUserData } from '@common/interfaces';  
 import { TokenPair } from '@common/interfaces/jwt-payload.interface';
 import { Injectable, BadRequestException, ConflictException } from '@nestjs/common';
-import { RegisterDto, LoginDto, RegisterResponseDto } from './dto';
+import { RegisterDto, LoginDto, RegisterResponseDto, TokenPairResponseDto } from './dto';
 
 @Injectable()
 export class AuthService {
@@ -68,37 +70,42 @@ export class AuthService {
     return new SuccessResponse(response, 'Account created successfully.');
   }
 
-  async login(
-    loginDto: LoginDto,
-    clientInfo: ClientInfo
-  ): Promise<SuccessResponse<TokenPair>> {
-    
+  async login(loginDto: LoginDto, clientInfo: ClientInfo): Promise<SuccessResponse<TokenPair>> {
     const user = await this.authRepository.findByCredential(loginDto.credential);
 
     if (!user) {
-        throw new BadRequestException(AUTH_MESSAGES.INVALID_CREDENTIALS);
+      throw new BadRequestException(AUTH_MESSAGES.INVALID_CREDENTIALS);
     }
 
-    const isPasswordValid = await this.passwordService.verifyPassword(loginDto.password, user.password);
+    const isPasswordValid = await this.passwordService.verifyPassword(
+      loginDto.password,
+      user.password,
+    );
 
     if (!isPasswordValid) {
-        throw new BadRequestException(AUTH_MESSAGES.INVALID_CREDENTIALS);
+      throw new BadRequestException(AUTH_MESSAGES.INVALID_CREDENTIALS);
     }
 
     const authTokens = await this.sessionService.createSession({
-        userId: user.id,
-        userAgent: clientInfo.userAgent,
-        ipAddress: clientInfo.ipAddress
+      userId: user.id,
+      userAgent: clientInfo.userAgent,
+      ipAddress: clientInfo.ipAddress,
     });
 
     const response: TokenPair = {
-        accessToken: authTokens.accessToken,
-        refreshToken: authTokens.refreshToken,
-    }
+      accessToken: authTokens.accessToken,
+      refreshToken: authTokens.refreshToken,
+    };
 
-    return new SuccessResponse(
-        response,
-        AUTH_MESSAGES.LOGIN_SUCCESS
-    )
+    return new SuccessResponse(response, AUTH_MESSAGES.LOGIN_SUCCESS);
+  }
+
+  async refresh(
+    user: CurrentUserData,
+    session: AuthSession,
+  ): Promise<SuccessResponse<TokenPairResponseDto>> {
+    const tokens = await this.sessionService.rotateRefreshToken(user.id, session.id);
+
+    return new SuccessResponse(tokens, AUTH_MESSAGES.LOGIN_SUCCESS);
   }
 }

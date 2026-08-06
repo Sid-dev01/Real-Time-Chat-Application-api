@@ -4,13 +4,26 @@ import {
     ExceptionFilter,
     HttpException,
     HttpStatus,
+    Logger
 } from '@nestjs/common';
 import { FastifyReply } from 'fastify';
 
 
 @Catch()
 export class AllExceptionFilter implements ExceptionFilter{
+
+    private readonly logger = new Logger(AllExceptionFilter.name);
+
     catch(exception: unknown, host: ArgumentsHost) : void {
+
+        if(exception instanceof Error) {
+            this.logger.error(
+                exception.message,
+                exception.stack,
+            );
+        }else {
+            this.logger.error(String(exception));
+        }
 
         const context = host.switchToHttp();
 

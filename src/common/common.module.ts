@@ -1,13 +1,15 @@
 import { Global, Module } from '@nestjs/common';
-import { PasswordService } from './services/password.service';
+import { PasswordService, TokenHashService } from '@common/services';
 
 @Global()
 @Module({
     providers: [
-        PasswordService
+        PasswordService,
+        TokenHashService
     ],
     exports: [
-        PasswordService
+        PasswordService,
+        TokenHashService
     ],
 })
 

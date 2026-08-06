@@ -13,4 +13,10 @@ export const AUTH_MESSAGES = {
     ACCESS_TOKKEN_REQUIRED: 'Access token is required.',
 
     INVALID_ACCESS_TOKEN: 'Invalid access token.',
+
+    REFRESH_TOKEN_REQUIRED: 'Refresh token is required.',
+
+    REFRESH_TOKEN_EXPIRED: 'Refresh token has expired.',
+
+    INVALID_REFRESH_TOKEN: 'Invalid refresh token.',
 } as const;
