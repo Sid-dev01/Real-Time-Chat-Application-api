@@ -64,9 +64,10 @@ export class TokenService {
     });
   }
 
-  async generateAccessToken(userId: string): Promise<string> {
+  async generateAccessToken(userId: string, sessionId: string): Promise<string> {
     const payload: AccessTokenPayload = {
       sub: userId,
+      sid: sessionId
     };
 
     return this.generateToken(payload, this.accessTokenSecret, this.accessTokenExpiresIn);
@@ -91,7 +92,7 @@ export class TokenService {
 
   async generateAuthTokens(userId: string, sessionId: string): Promise<TokenPair> {
     const [accessToken, refreshToken] = await Promise.all([
-      this.generateAccessToken(userId),
+      this.generateAccessToken(userId, sessionId),
       this.generateRefreshToken(userId, sessionId),
     ]);
 

@@ -19,4 +19,8 @@ export const AUTH_MESSAGES = {
     REFRESH_TOKEN_EXPIRED: 'Refresh token has expired.',
 
     INVALID_REFRESH_TOKEN: 'Invalid refresh token.',
+
+    LOGOUT_SUCCESS: 'Logout successful.',
+
+    LOGOUT_ALL_SUCCESS: 'All sessions have been logged out successfully.',
 } as const;

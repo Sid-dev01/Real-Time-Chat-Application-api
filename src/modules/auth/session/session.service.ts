@@ -5,8 +5,8 @@ import { SessionStatus } from '@common/constants';
 import { TokenHashService } from '@common/services';
 import { TokenService } from '../jwt/token.service';
 import { SessionRepository } from './session.repository';
-
 import { CreateSessionData } from './interfaces/session.interface';
+
 
 @Injectable()
 export class SessionService {
@@ -52,5 +52,13 @@ export class SessionService {
     await this.sessionRepository.rotateRefreshToken(sessionId, refreshTokenHash, expiresAt);
 
     return authTokens;
+  }
+
+  async revokeSession(sessionId: string): Promise<void> {
+    await this.sessionRepository.revoke(sessionId);
+  }
+
+  async revokeAllSessions(userId: string): Promise<void> {
+    await this.sessionRepository.revokeAll(userId);
   }
 }

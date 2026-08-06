@@ -7,9 +7,10 @@ import {
 import { Reflector } from '@nestjs/core';
 import { FastifyRequest } from 'fastify';
 import { IS_PUBLIC_KEY } from '@common/decorators';
-import { AUTH_MESSAGES } from '@common/constants';
 import { TokenService } from '@modules/auth/jwt/token.service';
+import { AUTH_MESSAGES, SessionStatus } from '@common/constants';
 import { AuthRepository } from '@modules/auth/auth/auth.repository';
+import { SessionRepository } from '@modules/auth/session/session.repository';
 
 
 @Injectable()
@@ -18,6 +19,7 @@ export class AccessTokenGuard implements CanActivate {
         private readonly reflector: Reflector,
         private readonly tokenService: TokenService,
         private readonly authRepository: AuthRepository,
+        private readonly sessionRepository: SessionRepository
     ) {}
 
     async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -45,6 +47,14 @@ export class AccessTokenGuard implements CanActivate {
 
         const payload = await this.tokenService.verifyAccessToken(token);
 
+        const session = await this.sessionRepository.findBySessionId(payload.sid);
+
+        if(!session || session.status !== SessionStatus.ACTIVE) {
+            throw new UnauthorizedException(
+                AUTH_MESSAGES.INVALID_ACCESS_TOKEN
+            )
+        }
+
         const user = await this.authRepository.findById(payload.sub);
 
         if(!user) {
@@ -57,6 +67,8 @@ export class AccessTokenGuard implements CanActivate {
             id: user.id,
             username: user.username
         };
+
+        request.session = session;
 
         return true;
     }
