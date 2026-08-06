@@ -18,11 +18,11 @@ export class SessionRepository {
     return createdSession;
   }
 
-  async findActiveBySessionId(sessionId: string): Promise<AuthSession | undefined> {
+  async findBySessionId(sessionId: string): Promise<AuthSession | undefined> {
     const [session] = await this.db
       .select()
       .from(authSessions)
-      .where(and(eq(authSessions.id, sessionId), eq(authSessions.status, SessionStatus.ACTIVE)))
+      .where(eq(authSessions.id, sessionId))
       .limit(1);
 
     return session;
