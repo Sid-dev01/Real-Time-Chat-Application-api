@@ -23,4 +23,6 @@ export const AUTH_MESSAGES = {
     LOGOUT_SUCCESS: 'Logout successful.',
 
     LOGOUT_ALL_SUCCESS: 'All sessions have been logged out successfully.',
+
+    USER_NOT_FOUND: 'User not found.',
 } as const;
