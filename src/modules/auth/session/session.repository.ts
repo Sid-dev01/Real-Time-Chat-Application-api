@@ -1,8 +1,8 @@
-import { authSessions, type AuthSession, type NewAuthSession } from '@db/schema';
-import { and, eq, lt, or } from 'drizzle-orm';
 import { Injectable } from '@nestjs/common';
+import { and, eq, lt, or } from 'drizzle-orm';
 import { SessionStatus } from '@common/constants';
 import { DrizzleService } from '@db/drizzle.service';
+import { authSessions, type AuthSession, type NewAuthSession } from '@db/schema';
 
 @Injectable()
 export class SessionRepository {
@@ -55,8 +55,23 @@ export class SessionRepository {
       .update(authSessions)
       .set({
         status: SessionStatus.REVOKED,
+        
       })
       .where(eq(authSessions.id, sessionId));
+  }
+
+  async revokeAll(userId: string): Promise<void> {
+    await this.db
+      .update(authSessions)
+      .set({
+        status: SessionStatus.REVOKED,
+      })
+      .where(
+        and(
+          eq(authSessions.userId, userId),
+          eq(authSessions.status, SessionStatus.ACTIVE)
+        )
+      )
   }
 
   async deleteExpiredSessions(): Promise<number> {

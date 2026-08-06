@@ -7,18 +7,16 @@ import {
     Ip,
     Req,
 } from '@nestjs/common';
+import { UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import type { AuthSession } from '@/db/schema';
+import { CurrentUser } from '@common/decorators';
+import { RefreshTokenGuard } from '@common/guards';
 import { LoginDto } from './dto/requests/login.dto';
-import { Client, CurrentSession, Public } from '@/common/decorators';
 import { type ClientInfo } from '@common/interfaces';
 import { RegisterDto } from './dto/requests/register.dto';
-import { UseGuards } from '@nestjs/common';
-import { RefreshTokenGuard } from '@common/guards';
-import { Get } from '@nestjs/common';
-import { CurrentUser } from '@common/decorators';
+import { Client, CurrentSession, Public } from '@/common/decorators';
 import type { CurrentUser as CurrentUserData } from '@common/interfaces';
-import type { AuthSession } from '@/db/schema';
 
 @Controller('auth')
 export class AuthController {
@@ -48,7 +46,6 @@ export class AuthController {
     @Post('refresh')
     @Public()
     @UseGuards(RefreshTokenGuard)
-    @ApiBearerAuth()
     async refresh(
         @CurrentUser() user: CurrentUserData,
         @CurrentSession() session: AuthSession,
@@ -57,5 +54,21 @@ export class AuthController {
             user,
             session
         )
+    }
+
+    @Post('logout')
+    @HttpCode(HttpStatus.OK)
+    async logout(
+        @CurrentSession() session: AuthSession,
+    ){
+        return this.authService.logout(session.id);
+    }
+
+    @Post('logout-all')
+    @HttpCode(HttpStatus.OK)
+    async logoutAllSessions(
+        @CurrentUser() user: CurrentUserData,
+    ) {
+        return this.authService.logoutAllSessions(user);
     }
 }

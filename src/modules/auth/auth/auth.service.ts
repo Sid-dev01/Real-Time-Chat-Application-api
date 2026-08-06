@@ -108,4 +108,16 @@ export class AuthService {
 
     return new SuccessResponse(tokens, AUTH_MESSAGES.LOGIN_SUCCESS);
   }
+
+  async logout(sessionId: string): Promise<SuccessResponse<null>> {
+    await this.sessionService.revokeSession(sessionId);
+
+    return new SuccessResponse(null, AUTH_MESSAGES.LOGOUT_SUCCESS);
+  }
+
+  async logoutAllSessions(user: CurrentUserData): Promise<SuccessResponse<null>> {
+    await this.sessionService.revokeAllSessions(user.id);
+
+    return new SuccessResponse(null, AUTH_MESSAGES.LOGOUT_SUCCESS);
+  }
 }

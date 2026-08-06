@@ -3,8 +3,9 @@ export interface JwtPayload {
     sid?: string;
 }
 
-export interface AccessTokenPayload {
+export interface AccessTokenPayload extends JwtPayload{
     sub: string;
+    sid: string;
 }
 
 export interface RefreshTokenPayload {
