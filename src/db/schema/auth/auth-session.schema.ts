@@ -1,4 +1,3 @@
-import { sql } from 'drizzle-orm';
 import {
     pgTable,
     varchar,
@@ -8,7 +7,6 @@ import {
     index,
 } from 'drizzle-orm/pg-core';
 import { users } from './user.schema';
-import { generateId } from '@common/utils';
 import { SessionStatus } from '@common/constants';
 
 export const authSessions = pgTable(
