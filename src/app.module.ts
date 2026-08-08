@@ -5,6 +5,7 @@ import { CommonModule } from './common/common.module';
 import { AuthModule } from '@modules/auth/auth.module';
 import { UsersModule } from '@modules/users/users.module';
 import { appConfig, envValidationSchema, authConfig } from './config';
+import { FriendshipModule } from '@modules/friendship/friendship.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { appConfig, envValidationSchema, authConfig } from './config';
     DrizzleModule,
     AuthModule,
     UsersModule,
+    FriendshipModule,
   ],
 })
 export class AppModule {}

@@ -1,3 +1,4 @@
+import { sql } from 'drizzle-orm';
 import {
     pgTable,
     varchar,
@@ -6,21 +7,35 @@ import {
     index,
     uniqueIndex,
 } from 'drizzle-orm/pg-core';
+
 import { users } from '@db/schema';
 import { FriendRequestStatus } from '@common/constants';
 
 export const friendRequests = pgTable(
     'friend_requests',
     {
-        id: varchar('id', { length: 26 }).primaryKey(),
+        id: varchar('id', { length: 26 })
+            .primaryKey(),
 
         senderId: varchar('sender_id', { length: 26 })
             .notNull()
             .references(() => users.id, {
                 onDelete: 'cascade',
             }),
-        
+
         receiverId: varchar('receiver_id', { length: 26 })
+            .notNull()
+            .references(() => users.id, {
+                onDelete: 'cascade',
+            }),
+
+        userLowId: varchar('user_low_id', { length: 26 })
+            .notNull()
+            .references(() => users.id, {
+                onDelete: 'cascade',
+            }),
+
+        userHighId: varchar('user_high_id', { length: 26 })
             .notNull()
             .references(() => users.id, {
                 onDelete: 'cascade',
@@ -30,7 +45,7 @@ export const friendRequests = pgTable(
             .notNull()
             .default(FriendRequestStatus.PENDING),
 
-        createdAt: timestamp('created_at',{
+        createdAt: timestamp('created_at', {
             withTimezone: true,
         })
             .defaultNow()
@@ -40,16 +55,20 @@ export const friendRequests = pgTable(
             withTimezone: true,
         })
             .defaultNow()
-            .notNull()
+            .notNull(),
     },
+
     (table) => ({
-        senderReceiverUniqueIdx: uniqueIndex(
-            'friend_requests_sender_receiver_unique_idx',
-        ).on(table.senderId, table.receiverId),
+        activeRelationshipUniqueIdx: uniqueIndex(
+            'friend_requests_active_relationship_unique_idx',
+        )
+            .on(table.userLowId, table.userHighId)
+            .where(
+                sql`${table.friendshipStatus} IN (1, 2)`,
+            ),
 
         statusIdx: index(
             'friend_requests_status_idx',
         ).on(table.friendshipStatus),
     }),
-
-)
+);

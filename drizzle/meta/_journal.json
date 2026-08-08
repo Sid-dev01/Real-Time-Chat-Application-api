@@ -19,8 +19,8 @@
     {
       "idx": 2,
       "version": "7",
-      "when": 1786102105890,
-      "tag": "0002_add_friend_requests",
+      "when": 1786172577269,
+      "tag": "0002_friend_request_table",
       "breakpoints": true
     }
   ]
