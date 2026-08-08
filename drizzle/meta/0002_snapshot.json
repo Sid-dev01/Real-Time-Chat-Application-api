@@ -1,5 +1,5 @@
 {
-  "id": "d031a80a-1166-444d-bc8b-4222924f9230",
+  "id": "cf55fc7b-fe1d-44c2-a1eb-382657a46eca",
   "prevId": "da793a56-ee57-46e4-bc4c-8660cb1469f5",
   "version": "7",
   "dialect": "postgresql",
@@ -217,6 +217,18 @@
           "primaryKey": false,
           "notNull": true
         },
+        "user_low_id": {
+          "name": "user_low_id",
+          "type": "varchar(26)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "user_high_id": {
+          "name": "user_high_id",
+          "type": "varchar(26)",
+          "primaryKey": false,
+          "notNull": true
+        },
         "friendship_status": {
           "name": "friendship_status",
           "type": "smallint",
@@ -240,23 +252,24 @@
         }
       },
       "indexes": {
-        "friend_requests_sender_receiver_unique_idx": {
-          "name": "friend_requests_sender_receiver_unique_idx",
+        "friend_requests_active_relationship_unique_idx": {
+          "name": "friend_requests_active_relationship_unique_idx",
           "columns": [
             {
-              "expression": "sender_id",
+              "expression": "user_low_id",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
             },
             {
-              "expression": "receiver_id",
+              "expression": "user_high_id",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
             }
           ],
           "isUnique": true,
+          "where": "\"friend_requests\".\"friendship_status\" IN (1, 2)",
           "concurrently": false,
           "method": "btree",
           "with": {}
@@ -297,6 +310,32 @@
           "tableTo": "users",
           "columnsFrom": [
             "receiver_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "friend_requests_user_low_id_users_id_fk": {
+          "name": "friend_requests_user_low_id_users_id_fk",
+          "tableFrom": "friend_requests",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_low_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "friend_requests_user_high_id_users_id_fk": {
+          "name": "friend_requests_user_high_id_users_id_fk",
+          "tableFrom": "friend_requests",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_high_id"
           ],
           "columnsTo": [
             "id"
