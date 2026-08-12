@@ -7,7 +7,7 @@ import { AuthRepository } from './auth.repository';
 import { SuccessResponse } from '@common/responses';
 import { SessionService } from '../session/session.service';
 import { PasswordService } from '@common/services/password.service';
-import { CurrentUser as CurrentUserData } from '@common/interfaces';  
+import { CurrentUserData  } from '@common/interfaces';  
 import { TokenPair } from '@common/interfaces/jwt-payload.interface';
 import { Injectable, BadRequestException, ConflictException } from '@nestjs/common';
 import { RegisterDto, LoginDto, RegisterResponseDto, TokenPairResponseDto } from './dto';
