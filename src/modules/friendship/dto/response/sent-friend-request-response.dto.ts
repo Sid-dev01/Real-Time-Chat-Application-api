@@ -1,7 +1,7 @@
-export class FriendRequestResponseDto {
+export class SentFriendRequestResponseDto {
     id!: string;
-    senderId!: string;
     receiverId!: string;
+    receiverUsername!: string;
     status!: string;
     createdAt!: Date;
 }
