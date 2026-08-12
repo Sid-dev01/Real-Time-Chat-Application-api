@@ -16,7 +16,7 @@ import { LoginDto } from './dto/requests/login.dto';
 import { type ClientInfo } from '@common/interfaces';
 import { RegisterDto } from './dto/requests/register.dto';
 import { Client, CurrentSession, Public } from '@/common/decorators';
-import type { CurrentUser as CurrentUserData } from '@common/interfaces';
+import type { CurrentUserData } from '@common/interfaces';
 
 @Controller('auth')
 export class AuthController {

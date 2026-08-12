@@ -9,7 +9,7 @@ import {
 import { UsersService } from './users.service';
 import { CurrentUser, Public } from '@common/decorators';
 import { UpdateProfileRequestDto, SearchUserRequestDto } from './dto';
-import type { CurrentUser as CurrentUserData } from '@common/interfaces';
+import type { CurrentUserData } from '@common/interfaces';
 
 
 @Controller('users')

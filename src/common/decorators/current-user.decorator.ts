@@ -1,7 +1,7 @@
 import { FastifyRequest } from 'fastify';
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 
-import type { CurrentUser as CurrentUserData} from '@common/interfaces';
+import type { CurrentUserData} from '@common/interfaces';
 
 export const CurrentUser = createParamDecorator(
   (_: unknown, context: ExecutionContext): CurrentUserData => {

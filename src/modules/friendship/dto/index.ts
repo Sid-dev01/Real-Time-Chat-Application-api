@@ -1,0 +1,1 @@
+export * from './response/friend-request-response.dto';

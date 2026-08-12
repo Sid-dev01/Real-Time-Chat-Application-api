@@ -23,6 +23,7 @@ import { SessionRepository } from './session/session.repository';
     ],
     exports: [
         AuthService,
+        AuthRepository,
     ]
 })
 
